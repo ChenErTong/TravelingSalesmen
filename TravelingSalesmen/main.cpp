@@ -6,6 +6,10 @@ using namespace std;
 
 #define MAX_CITY 50
 #define ITERATION 1000
+#define TEMPERATURE 280
+#define LOWEEST_TEMPERATURE 0.0001
+#define ALPHA 0.98
+#define CONSISTENT_TIME 10
 
 struct City{
 	int id;
@@ -74,8 +78,13 @@ double simulatedAnnealing(double distance, int n, double t) {
 	return distance;
 }
 
-int main() {
-	string path = "TSP20.txt", line;
+int main(int argc, char* argv[]) {
+	string path, line;
+	if (argc > 1) {
+		path = argv[1];
+	} else {
+		path = "TSP20.txt";
+	}
 	ifstream in(path);
 	if (in) {
 		int n;
@@ -95,10 +104,10 @@ int main() {
 		
 		int count = 1;
 		double cache;
-		for (double t = 280; t > 0.0001; t *= 0.98) {
+		for (double t = TEMPERATURE; t > LOWEEST_TEMPERATURE; t *= ALPHA) {
 			cache = simulatedAnnealing(distance, n, t);
 			if (cache == distance) {
-				if (++count == 10) {
+				if (++count == CONSISTENT_TIME) {
 					break;
 				}
 			} else {
@@ -108,5 +117,6 @@ int main() {
 		}
 		cout <<  distance << ": ";
 		output(n);
+		return 1;
 	}
 }
